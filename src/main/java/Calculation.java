@@ -74,8 +74,47 @@ public class Calculation {
         ArrayList<String> vocabulary = cal.getVocabulary();
         double[][] t_matrix = cal.getTMatrix();
 
-        cal.CalDocumentVector(p_words_list, vocabulary, t_matrix);
+        List<List<Double>> document_vector = cal.CalDocumentVector(p_words_list, vocabulary, t_matrix);
 
+        document_vector = cal.normalize_vectors(document_vector);
+        cal.serialize_document_vector(document_vector);
+
+
+    }
+
+    private List<List<Double>> normalize_vectors(List<List<Double>> document_vector){
+
+        for(int i =0 ; i < document_vector.size() ; i++){
+            Double sum = 0.0;
+            for (int j = 0 ; j < document_vector.get(i).size() ; j++){
+                sum += document_vector.get(i).get(j);
+            }
+            for (int j = 0 ; j < document_vector.get(i).size() ; j++){
+                if (!sum.equals(0.0)){
+                    document_vector.get(i).set( j ,  document_vector.get(i).get(j)/sum);
+                }
+            }
+        }
+        return document_vector;
+    }
+
+    private void serialize_document_vector(List<List<Double>> document_vector) {
+        try {
+            FileOutputStream fileOut =
+                    new FileOutputStream("Serialized_folder/document_vector.ser");
+
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(document_vector);
+            out.close();
+            fileOut.close();
+            System.out.printf("Serialized data is saved in Serialized_folder/document_vector.ser");
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private List<String> getPWordList(){
