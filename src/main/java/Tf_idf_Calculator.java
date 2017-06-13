@@ -66,19 +66,14 @@ public class Tf_idf_Calculator {
             //tokenizing and lemmatizing
             StanfordLemmatizer slem = new StanfordLemmatizer();
             List<String> lemmatized_text = slem.lemmatize(lowercase_document);
-            String text = String.join(" " , lemmatized_text);
+            String text = String.join(" ", lemmatized_text);
 
             document_array[i] = text;
-            tf.add_to_vocabulary(text , i);
+            tf.add_to_vocabulary(text, i);
+
+            System.out.println("Document : " + i + " - NLP Pipeline Done" );
 
         }
-
-
-//
-//        System.out.println(document);
-//        System.out.println(lowercase_document);
-//        System.out.println(slem.lemmatize(lowercase_document));
-
 
     }
 
@@ -93,7 +88,7 @@ public class Tf_idf_Calculator {
             for (int j = 0; j < n; j++) {
                 t_matrix[i][j] = calculate_tfidf(vocabulary.get(i), document_array[j], document_array);
             }
-            System.out.println("term " + (i+1) + " / " + term_count + " - done" );
+            System.out.println("term " + (i + 1) + " / " + term_count + " - done");
         }
 
     }
@@ -132,7 +127,7 @@ public class Tf_idf_Calculator {
         return tf * idf;
     }
 
-    private void serialize_t_matrix(){
+    private void serialize_t_matrix() {
         try {
             FileOutputStream fileOut =
                     new FileOutputStream("Serialized_folder/t_matrix.ser");
@@ -151,46 +146,37 @@ public class Tf_idf_Calculator {
         }
     }
 
-    private double calc_gtf(String term, String[] corpus){
+    private double calc_gtf(String term, String[] corpus) {
         double sum = 0.0;
         double n = document_array.length;
-        for (int i = 0 ; i <n ; i++ ){
-            sum += calc_tf(term , corpus[i]);
+        for (int i = 0; i < n; i++) {
+            sum += calc_tf(term, corpus[i]);
         }
-        return sum/n;
+        return sum / n;
     }
-    private double calculate_gtfid(String term, String[] corpus){
+
+    private double calculate_gtfid(String term, String[] corpus) {
         double gtf = calc_gtf(term, corpus);
         double idf = calc_idf(term, corpus);
 
-        return gtf*idf;
+        return gtf * idf;
     }
 
-    private String[] get_top_p_words(int p){
+    private String[] get_top_p_words(int p) {
 
         HashMap<String, Double> map = new HashMap<String, Double>();
         ValueComparator bvc = new ValueComparator(map);
         TreeMap<String, Double> sorted_map = new TreeMap<String, Double>(bvc);
         String[] p_words = new String[p];
 
-//            map.put("A", 99.5);
-//            map.put("B", 67.4);
-//            map.put("C", 67.9);
-//            map.put("D", 67.3);
-
-        for (int i=0; i< vocabulary.size() ; i++){
-            map.put(vocabulary.get(i), calculate_gtfid(vocabulary.get(i) , document_array));
+        for (int i = 0; i < vocabulary.size(); i++) {
+            map.put(vocabulary.get(i), calculate_gtfid(vocabulary.get(i), document_array));
         }
 
         sorted_map.putAll(map);
 
-//
-//        System.out.println("unsorted map: " + map);
-//        sorted_map.putAll(map);
-//        System.out.println("results: " + sorted_map);
-
         int count = 0;
-        for (Map.Entry<String,Double> entry:sorted_map.entrySet()) {
+        for (Map.Entry<String, Double> entry : sorted_map.entrySet()) {
             if (count >= p) break;
 
             p_words[count] = entry.getKey();
@@ -200,7 +186,7 @@ public class Tf_idf_Calculator {
 
     }
 
-    private void serialize_p_list(String[] p_list){
+    private void serialize_p_list(String[] p_list) {
         try {
             FileOutputStream fileOut =
                     new FileOutputStream("Serialized_folder/p_list.ser");
@@ -219,11 +205,30 @@ public class Tf_idf_Calculator {
         }
     }
 
+    private void serialize_vocabulary() {
+        try {
+            FileOutputStream fileOut =
+                    new FileOutputStream("Serialized_folder/vocabulary.ser");
+
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(vocabulary);
+            out.close();
+            fileOut.close();
+            System.out.printf("Serialized data is saved in Serialized_folder/vocabulary.ser");
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static void main(String[] args) {
 
         //define document count
-        int n = 3;
+        int n = 27;
 
         Tf_idf_Calculator tf = new Tf_idf_Calculator(n);
         tf.nlp_pipeline(tf, n);
@@ -234,13 +239,14 @@ public class Tf_idf_Calculator {
 
         //serialize t_matrix
         tf.serialize_t_matrix();
-        // calculate top p words
 
+        // calculate top p words
         int p = 4;
         String[] p_words = tf.get_top_p_words(p);
         System.out.println("Filtered p top words");
 
         tf.serialize_p_list(p_words);
+        tf.serialize_vocabulary();
 
 
     }
