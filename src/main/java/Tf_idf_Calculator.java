@@ -162,7 +162,7 @@ public class Tf_idf_Calculator {
         return gtf * idf;
     }
 
-    private String[] get_top_p_words(int p) {
+    private List<String> get_top_p_words(int p) {
 
         HashMap<String, Double> map = new HashMap<String, Double>();
         ValueComparator bvc = new ValueComparator(map);
@@ -182,11 +182,12 @@ public class Tf_idf_Calculator {
             p_words[count] = entry.getKey();
             count++;
         }
-        return p_words;
+        List<String> p_word_list = Arrays.asList(p_words);
+        return p_word_list;
 
     }
 
-    private void serialize_p_list(String[] p_list) {
+    private void serialize_p_list(List<String> p_list) {
         try {
             FileOutputStream fileOut =
                     new FileOutputStream("Serialized_folder/p_list.ser");
@@ -228,7 +229,7 @@ public class Tf_idf_Calculator {
     public static void main(String[] args) {
 
         //define document count
-        int n = 27;
+        int n = 3;
 
         Tf_idf_Calculator tf = new Tf_idf_Calculator(n);
         tf.nlp_pipeline(tf, n);
@@ -242,10 +243,10 @@ public class Tf_idf_Calculator {
 
         // calculate top p words
         int p = 4;
-        String[] p_words = tf.get_top_p_words(p);
+        List<String> p_words_list = tf.get_top_p_words(p);
         System.out.println("Filtered p top words");
 
-        tf.serialize_p_list(p_words);
+        tf.serialize_p_list(p_words_list);
         tf.serialize_vocabulary();
 
 
