@@ -229,7 +229,7 @@ public class Tf_idf_Calculator {
     public static void main(String[] args) {
 
         //define document count
-        int n = 3;
+        int n = 27;
 
         Tf_idf_Calculator tf = new Tf_idf_Calculator(n);
         tf.nlp_pipeline(tf, n);
