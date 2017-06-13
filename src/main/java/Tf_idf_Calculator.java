@@ -1,6 +1,8 @@
 import java.io.*;
 import java.util.*;
 
+import static java.lang.String.join;
+
 /**
  * Created by Keetmalin on 6/13/2017
  * Project - Tf-idf calculator with Pipeline
@@ -8,7 +10,7 @@ import java.util.*;
 public class Tf_idf_Calculator {
 
     private double[][] t_matrix;
-    private ArrayList<String> vocabulary = new ArrayList<>();
+    private ArrayList<String> vocabulary = new ArrayList<String>();
     private String[] document_array;
 
     private Tf_idf_Calculator(int n) {
@@ -20,7 +22,7 @@ public class Tf_idf_Calculator {
         String document = "";
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new FileReader("src/" + file_name));
+            reader = new BufferedReader(new FileReader(file_name));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -56,17 +58,18 @@ public class Tf_idf_Calculator {
         for (int i = 0; i < n; i++) {
 
             // open file
-            String document = tf.file_reader("Cases/case" + (n + 1));
+            String document = tf.file_reader("Cases/case" + (i) + ".txt");
 
             //convert to lowercase
             String lowercase_document = tf.convert_to_lowercase(document);
 
-            //tokanizing and lemmatizing
-//            StanfordLemmatizer slem = new StanfordLemmatizer();
-//            String lemmatized_text = slem.lemmatize(lowercase_document);
+            //tokenizing and lemmatizing
+            StanfordLemmatizer slem = new StanfordLemmatizer();
+            List<String> lemmatized_text = slem.lemmatize(lowercase_document);
+            String text = String.join(" " , lemmatized_text);
 
-//            document_array[i] = lemmatized_text;
-//            tf.add_to_vocabulary(lemmatized_text);
+            document_array[i] = text;
+            tf.add_to_vocabulary(text , i);
 
         }
 
@@ -86,11 +89,11 @@ public class Tf_idf_Calculator {
     private void fill_t_matrix(int n) {
         int term_count = vocabulary.size();
 
-        for (int i = 0; i < vocabulary.size(); i++) {
+        for (int i = 0; i < term_count; i++) {
             for (int j = 0; j < n; j++) {
                 t_matrix[i][j] = calculate_tfidf(vocabulary.get(i), document_array[j], document_array);
             }
-            System.out.println("term " + i+1 + " / " + term_count + " - done" );
+            System.out.println("term " + (i+1) + " / " + term_count + " - done" );
         }
 
     }
@@ -176,7 +179,7 @@ public class Tf_idf_Calculator {
 //            map.put("D", 67.3);
 
         for (int i=0; i< vocabulary.size() ; i++){
-            map.put(vocabulary.get(i), calc_gtf(vocabulary.get(i) , document_array));
+            map.put(vocabulary.get(i), calculate_gtfid(vocabulary.get(i) , document_array));
         }
 
         sorted_map.putAll(map);
@@ -197,11 +200,30 @@ public class Tf_idf_Calculator {
 
     }
 
+    private void serialize_p_list(String[] p_list){
+        try {
+            FileOutputStream fileOut =
+                    new FileOutputStream("Serialized_folder/p_list.ser");
+
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(p_list);
+            out.close();
+            fileOut.close();
+            System.out.printf("Serialized data is saved in Serialized_folder/p_list.ser");
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static void main(String[] args) {
 
         //define document count
-        int n = 1;
+        int n = 3;
 
         Tf_idf_Calculator tf = new Tf_idf_Calculator(n);
         tf.nlp_pipeline(tf, n);
@@ -216,7 +238,9 @@ public class Tf_idf_Calculator {
 
         int p = 4;
         String[] p_words = tf.get_top_p_words(p);
-        System.out.println();
+        System.out.println("Filtered p top words");
+
+        tf.serialize_p_list(p_words);
 
 
     }

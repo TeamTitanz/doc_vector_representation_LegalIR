@@ -1,2 +1,5 @@
 .idea/
 .iml
+TFIDF.iml
+src/test/
+target/
