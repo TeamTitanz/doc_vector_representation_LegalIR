@@ -12,13 +12,14 @@ public class Tf_idf_Calculator {
     private double[][] t_matrix;
     private ArrayList<String> vocabulary = new ArrayList<String>();
     private String[] document_array;
+    StanfordLemmatizer slem = new StanfordLemmatizer();
 
     private Tf_idf_Calculator(int n) {
 
         document_array = new String[n];
     }
 
-    private String file_reader(String file_name) {
+    private String file_reader(String file_name) { 
         String document = "";
         BufferedReader reader = null;
         try {
@@ -55,17 +56,30 @@ public class Tf_idf_Calculator {
 
     private void nlp_pipeline(Tf_idf_Calculator tf, int n) {
 
+        File folder = new File("Cases");
+
+        File[] fileList = folder.listFiles();
+        String[] fileNames = new String[n];
+        for (int i = 0; i < fileList.length; i++) {
+            fileNames[i] = fileList[i].toString().split("\\\\")[1].split(".txt")[0];
+        }
+
+
+        Arrays.sort(fileNames);
+
         for (int i = 0; i < n; i++) {
 
+
+
             // open file
-            String document = tf.file_reader("Cases/case" + (i) + ".txt");
+            String document = tf.file_reader("Cases/" + fileNames[i] + ".txt");
 
             //convert to lowercase
-            String lowercase_document = tf.convert_to_lowercase(document);
+            //String lowercase_document = tf.convert_to_lowercase(document);
 
             //tokenizing and lemmatizing
-            StanfordLemmatizer slem = new StanfordLemmatizer();
-            List<String> lemmatized_text = slem.lemmatize(lowercase_document);
+
+            List<String> lemmatized_text = slem.lemmatize(document);
             String text = String.join(" ", lemmatized_text);
 
             document_array[i] = text;
@@ -85,8 +99,9 @@ public class Tf_idf_Calculator {
         int term_count = vocabulary.size();
 
         for (int i = 0; i < term_count; i++) {
+            String temp = vocabulary.get(i);
             for (int j = 0; j < n; j++) {
-                t_matrix[i][j] = calculate_tfidf(vocabulary.get(i), document_array[j], document_array);
+                t_matrix[i][j] = calculate_tfidf(temp, document_array[j], document_array);
             }
             System.out.println("term " + (i + 1) + " / " + term_count + " - done");
         }
@@ -229,7 +244,7 @@ public class Tf_idf_Calculator {
     public static void main(String[] args) {
 
         //define document count
-        int n = 27;
+        int n = new File("Cases").listFiles().length;
 
         Tf_idf_Calculator tf = new Tf_idf_Calculator(n);
         tf.nlp_pipeline(tf, n);
