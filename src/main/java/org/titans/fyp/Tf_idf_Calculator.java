@@ -243,7 +243,7 @@ public class Tf_idf_Calculator {
     public static void main(String[] args) {
 
         //define document count
-        int n = new File("./LawIE/DocVector/Cases").listFiles().length;
+        int n = 54935;
 
         Tf_idf_Calculator tf = new Tf_idf_Calculator(n);
         tf.nlp_pipeline(tf, n);
@@ -256,7 +256,7 @@ public class Tf_idf_Calculator {
         tf.serialize_t_matrix();
 
         // calculate top p words
-        int p = 4;
+        int p = 600;
         List<String> p_words_list = tf.get_top_p_words(p);
         System.out.println("Filtered p top words");
 
