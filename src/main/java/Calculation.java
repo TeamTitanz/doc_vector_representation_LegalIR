@@ -12,7 +12,7 @@ public class Calculation {
 
         List<List<Double>> DocumentVector = new ArrayList<List<Double>>();
 
-        File f = new File("Output");
+        File f = new File("./LawIE/DocVector/Output");
         FilenameFilter textFilter = new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.toLowerCase().endsWith(".txt");
@@ -101,7 +101,7 @@ public class Calculation {
     private void serialize_document_vector(List<List<Double>> document_vector) {
         try {
             FileOutputStream fileOut =
-                    new FileOutputStream("Serialized_folder/document_vector.ser");
+                    new FileOutputStream("./LawIE/DocVector/Serialized_folder/document_vector.ser");
 
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(document_vector);
@@ -120,7 +120,7 @@ public class Calculation {
     private List<String> getPWordList(){
         List<String> p_words_list =null;
         try {
-            File file = new File("Serialized_folder/p_list.ser");
+            File file = new File("./LawIE/DocVector/Serialized_folder/p_list.ser");
             if (file.exists()) {
                 System.out.println("P_LIST serialized file found. Reading from it");
                 FileInputStream fileIn = new FileInputStream(file);
@@ -144,7 +144,7 @@ public class Calculation {
     private ArrayList<String> getVocabulary(){
         ArrayList<String> vocabulary =null;
         try {
-            File file = new File("Serialized_folder/vocabulary.ser");
+            File file = new File("./LawIE/DocVector/Serialized_folder/vocabulary.ser");
             if (file.exists()) {
                 System.out.println("Vocabulary serialized file found. Reading from it");
                 FileInputStream fileIn = new FileInputStream(file);
@@ -169,7 +169,7 @@ public class Calculation {
     private double[][] getTMatrix(){
         double[][] t_matrix =null;
         try {
-            File file = new File("Serialized_folder/t_matrix.ser");
+            File file = new File("./LawIE/DocVector/Serialized_folder/t_matrix.ser");
             if (file.exists()) {
                 System.out.println("t_matrix serialized file found. Reading from it");
                 FileInputStream fileIn = new FileInputStream(file);

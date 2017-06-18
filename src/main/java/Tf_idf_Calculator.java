@@ -1,8 +1,6 @@
 import java.io.*;
 import java.util.*;
 
-import static java.lang.String.join;
-
 /**
  * Created by Keetmalin on 6/13/2017
  * Project - Tf-idf calculator with Pipeline
@@ -56,12 +54,12 @@ public class Tf_idf_Calculator {
 
     private void nlp_pipeline(Tf_idf_Calculator tf, int n) {
 
-        File folder = new File("Cases");
+        File folder = new File("./LawIE/DocVector/Cases");
 
         File[] fileList = folder.listFiles();
         String[] fileNames = new String[n];
         for (int i = 0; i < fileList.length; i++) {
-            fileNames[i] = fileList[i].toString().split("\\\\")[1].split(".txt")[0];
+            fileNames[i] = fileList[i].toString().split("/")[1].split(".txt")[0];
         }
 
 
@@ -72,7 +70,7 @@ public class Tf_idf_Calculator {
 
 
             // open file
-            String document = tf.file_reader("Cases/" + fileNames[i] + ".txt");
+            String document = tf.file_reader("./LawIE/DocVector/Cases/" + fileNames[i] + ".txt");
 
             //convert to lowercase
             //String lowercase_document = tf.convert_to_lowercase(document);
@@ -145,7 +143,7 @@ public class Tf_idf_Calculator {
     private void serialize_t_matrix() {
         try {
             FileOutputStream fileOut =
-                    new FileOutputStream("Serialized_folder/t_matrix.ser");
+                    new FileOutputStream("./LawIE/DocVector/Serialized_folder/t_matrix.ser");
 
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(t_matrix);
@@ -205,7 +203,7 @@ public class Tf_idf_Calculator {
     private void serialize_p_list(List<String> p_list) {
         try {
             FileOutputStream fileOut =
-                    new FileOutputStream("Serialized_folder/p_list.ser");
+                    new FileOutputStream("./LawIE/DocVector/Serialized_folder/p_list.ser");
 
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(p_list);
@@ -224,7 +222,7 @@ public class Tf_idf_Calculator {
     private void serialize_vocabulary() {
         try {
             FileOutputStream fileOut =
-                    new FileOutputStream("Serialized_folder/vocabulary.ser");
+                    new FileOutputStream("./LawIE/DocVector/Serialized_folder/vocabulary.ser");
 
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(vocabulary);
@@ -244,7 +242,7 @@ public class Tf_idf_Calculator {
     public static void main(String[] args) {
 
         //define document count
-        int n = new File("Cases").listFiles().length;
+        int n = new File("./LawIE/DocVector/Cases").listFiles().length;
 
         Tf_idf_Calculator tf = new Tf_idf_Calculator(n);
         tf.nlp_pipeline(tf, n);
