@@ -1,3 +1,5 @@
+package org.titans.fyp;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,16 +84,16 @@ public class Calculation {
 
     }
 
-    private List<List<Double>> normalize_vectors(List<List<Double>> document_vector){
+    private List<List<Double>> normalize_vectors(List<List<Double>> document_vector) {
 
-        for(int i =0 ; i < document_vector.size() ; i++){
+        for (int i = 0; i < document_vector.size(); i++) {
             Double sum = 0.0;
-            for (int j = 0 ; j < document_vector.get(i).size() ; j++){
+            for (int j = 0; j < document_vector.get(i).size(); j++) {
                 sum += document_vector.get(i).get(j);
             }
-            for (int j = 0 ; j < document_vector.get(i).size() ; j++){
-                if (!sum.equals(0.0)){
-                    document_vector.get(i).set( j ,  document_vector.get(i).get(j)/sum);
+            for (int j = 0; j < document_vector.get(i).size(); j++) {
+                if (!sum.equals(0.0)) {
+                    document_vector.get(i).set(j, document_vector.get(i).get(j) / sum);
                 }
             }
         }
@@ -117,8 +119,8 @@ public class Calculation {
         }
     }
 
-    private List<String> getPWordList(){
-        List<String> p_words_list =null;
+    private List<String> getPWordList() {
+        List<String> p_words_list = null;
         try {
             File file = new File("./LawIE/DocVector/Serialized_folder/p_list.ser");
             if (file.exists()) {
@@ -141,8 +143,9 @@ public class Calculation {
 
         return p_words_list;
     }
-    private ArrayList<String> getVocabulary(){
-        ArrayList<String> vocabulary =null;
+
+    private ArrayList<String> getVocabulary() {
+        ArrayList<String> vocabulary = null;
         try {
             File file = new File("./LawIE/DocVector/Serialized_folder/vocabulary.ser");
             if (file.exists()) {
@@ -166,8 +169,8 @@ public class Calculation {
         return vocabulary;
     }
 
-    private double[][] getTMatrix(){
-        double[][] t_matrix =null;
+    private double[][] getTMatrix() {
+        double[][] t_matrix = null;
         try {
             File file = new File("./LawIE/DocVector/Serialized_folder/t_matrix.ser");
             if (file.exists()) {

@@ -1,3 +1,5 @@
+package org.titans.fyp;
+
 import java.io.*;
 import java.util.*;
 
@@ -17,7 +19,7 @@ public class Tf_idf_Calculator {
         document_array = new String[n];
     }
 
-    private String file_reader(String file_name) { 
+    private String file_reader(String file_name) {
         String document = "";
         BufferedReader reader = null;
         try {
@@ -68,7 +70,6 @@ public class Tf_idf_Calculator {
         for (int i = 0; i < n; i++) {
 
 
-
             // open file
             String document = tf.file_reader("./LawIE/DocVector/Cases/" + fileNames[i] + ".txt");
 
@@ -83,7 +84,7 @@ public class Tf_idf_Calculator {
             document_array[i] = text;
             tf.add_to_vocabulary(text, i);
 
-            System.out.println("Document : " + i + " - NLP Pipeline Done" );
+            System.out.println("Document : " + i + " - NLP Pipeline Done");
 
         }
 
