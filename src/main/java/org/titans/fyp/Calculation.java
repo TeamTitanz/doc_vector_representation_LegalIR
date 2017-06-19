@@ -10,11 +10,14 @@ import java.util.List;
  */
 public class Calculation {
 
+    public static String output_folder = "./LawIE/DocVector/Output";
+
+
     public List<List<Double>> CalDocumentVector(List<String> inputWordList, ArrayList<String> vocabulary, double[][] t_matrix) {
 
         List<List<Double>> DocumentVector = new ArrayList<List<Double>>();
 
-        File f = new File("./LawIE/DocVector/Output");
+        File f = new File(output_folder);
         FilenameFilter textFilter = new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.toLowerCase().endsWith(".txt");
@@ -103,13 +106,13 @@ public class Calculation {
     private void serialize_document_vector(List<List<Double>> document_vector) {
         try {
             FileOutputStream fileOut =
-                    new FileOutputStream("./LawIE/DocVector/Serialized_folder/document_vector.ser");
+                    new FileOutputStream(Tf_idf_Calculator.serialized_folder + File.separator + "document_vector.ser");
 
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(document_vector);
             out.close();
             fileOut.close();
-            System.out.printf("Serialized data is saved in Serialized_folder/document_vector.ser");
+            System.out.printf("Serialized data is saved in " + Tf_idf_Calculator.serialized_folder + File.separator + "document_vector.ser");
 
 
         } catch (FileNotFoundException e) {
@@ -122,7 +125,7 @@ public class Calculation {
     private List<String> getPWordList() {
         List<String> p_words_list = null;
         try {
-            File file = new File("./LawIE/DocVector/Serialized_folder/p_list.ser");
+            File file = new File(Tf_idf_Calculator.serialized_folder + File.separator + "p_list.ser");
             if (file.exists()) {
                 System.out.println("P_LIST serialized file found. Reading from it");
                 FileInputStream fileIn = new FileInputStream(file);
@@ -131,7 +134,7 @@ public class Calculation {
                 in.close();
                 fileIn.close();
             } else {
-                System.out.println("P_LIST word serlized file not found");
+                System.out.println("P_LIST word serlized file not found in" + Tf_idf_Calculator.serialized_folder + File.separator + "p_list.ser");
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -147,7 +150,7 @@ public class Calculation {
     private ArrayList<String> getVocabulary() {
         ArrayList<String> vocabulary = null;
         try {
-            File file = new File("./LawIE/DocVector/Serialized_folder/vocabulary.ser");
+            File file = new File(Tf_idf_Calculator.serialized_folder + File.separator + "vocabulary.ser");
             if (file.exists()) {
                 System.out.println("Vocabulary serialized file found. Reading from it");
                 FileInputStream fileIn = new FileInputStream(file);
@@ -156,7 +159,7 @@ public class Calculation {
                 in.close();
                 fileIn.close();
             } else {
-                System.out.println("Vocabulary serialized file not found");
+                System.out.println("Vocabulary serialized file not found in " + Tf_idf_Calculator.serialized_folder + File.separator + "vocabulary.ser");
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -172,7 +175,7 @@ public class Calculation {
     private double[][] getTMatrix() {
         double[][] t_matrix = null;
         try {
-            File file = new File("./LawIE/DocVector/Serialized_folder/t_matrix.ser");
+            File file = new File(Tf_idf_Calculator.serialized_folder + File.separator + "t_matrix.ser");
             if (file.exists()) {
                 System.out.println("t_matrix serialized file found. Reading from it");
                 FileInputStream fileIn = new FileInputStream(file);
@@ -181,7 +184,7 @@ public class Calculation {
                 in.close();
                 fileIn.close();
             } else {
-                System.out.println("t_matrix serialized file not found");
+                System.out.println("t_matrix serialized file not found in " + Tf_idf_Calculator.serialized_folder + File.separator + "t_matrix.ser");
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();

@@ -13,6 +13,8 @@ public class Tf_idf_Calculator {
     private ArrayList<String> vocabulary = new ArrayList<String>();
     private String[] document_array;
     StanfordLemmatizer slem = new StanfordLemmatizer();
+    public static String cases_folder_path = "./LawIE/DocVector/Cases";
+    public static String serialized_folder = "./LawIE/DocVector/Serialized_folder";
 
     private Tf_idf_Calculator(int n) {
 
@@ -56,12 +58,16 @@ public class Tf_idf_Calculator {
 
     private void nlp_pipeline(Tf_idf_Calculator tf, int n) {
 
-        File folder = new File("./LawIE/DocVector/Cases");
+        File folder = new File(cases_folder_path);
 
         File[] fileList = folder.listFiles();
         String[] fileNames = new String[n];
         for (int i = 0; i < fileList.length; i++) {
-            fileNames[i] = fileList[i].toString().split("/")[1].split(".txt")[0];
+            String full_name = fileList[i].toString();
+            int start_index = full_name.lastIndexOf(File.separator);
+            int end_index = full_name.lastIndexOf('.');
+            fileNames[i] = full_name.substring(start_index + 1, end_index);
+            System.out.println(fileNames[i]);
         }
 
 
@@ -71,7 +77,7 @@ public class Tf_idf_Calculator {
 
 
             // open file
-            String document = tf.file_reader("./LawIE/DocVector/Cases/" + fileNames[i] + ".txt");
+            String document = tf.file_reader(cases_folder_path + File.separator + fileNames[i] + ".txt");
 
             //convert to lowercase
             //String lowercase_document = tf.convert_to_lowercase(document);
@@ -144,13 +150,13 @@ public class Tf_idf_Calculator {
     private void serialize_t_matrix() {
         try {
             FileOutputStream fileOut =
-                    new FileOutputStream("./LawIE/DocVector/Serialized_folder/t_matrix.ser");
+                    new FileOutputStream(serialized_folder + File.separator + "t_matrix.ser");
 
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(t_matrix);
             out.close();
             fileOut.close();
-            System.out.printf("Serialized data is saved in Serialized_folder/t_matrix.ser");
+            System.out.printf("Serialized data is saved in " + serialized_folder + File.separator + "t_matrix.ser");
 
 
         } catch (FileNotFoundException e) {
@@ -204,13 +210,13 @@ public class Tf_idf_Calculator {
     private void serialize_p_list(List<String> p_list) {
         try {
             FileOutputStream fileOut =
-                    new FileOutputStream("./LawIE/DocVector/Serialized_folder/p_list.ser");
+                    new FileOutputStream(serialized_folder + File.separator + "p_list.ser");
 
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(p_list);
             out.close();
             fileOut.close();
-            System.out.printf("Serialized data is saved in Serialized_folder/p_list.ser");
+            System.out.printf("Serialized data is saved in " + serialized_folder + File.separator + "p_list.ser");
 
 
         } catch (FileNotFoundException e) {
@@ -223,13 +229,13 @@ public class Tf_idf_Calculator {
     private void serialize_vocabulary() {
         try {
             FileOutputStream fileOut =
-                    new FileOutputStream("./LawIE/DocVector/Serialized_folder/vocabulary.ser");
+                    new FileOutputStream(serialized_folder + File.separator + "vocabulary.ser");
 
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(vocabulary);
             out.close();
             fileOut.close();
-            System.out.printf("Serialized data is saved in Serialized_folder/vocabulary.ser");
+            System.out.printf("Serialized data is saved in " + serialized_folder + File.separator + "vocabulary.ser");
 
 
         } catch (FileNotFoundException e) {
@@ -242,8 +248,24 @@ public class Tf_idf_Calculator {
 
     public static void main(String[] args) {
 
+        if (args.length == 2) {
+            cases_folder_path = args[0];
+            serialized_folder = args[1];
+            System.out.println("Cases Folder = " + cases_folder_path);
+            System.out.println("Serialized Folder = " + serialized_folder);
+        }
+        if (args.length == 3) {
+            cases_folder_path = args[0];
+            serialized_folder = args[1];
+            Calculation.output_folder = args[2];
+            System.out.println("Cases Folder = " + cases_folder_path);
+            System.out.println("Serialized Folder = " + serialized_folder);
+            System.out.println("Output Folder = " + Calculation.output_folder);
+        }
+
         //define document count
-        int n = 54935;
+        int n = new File(cases_folder_path).listFiles().length;
+        System.out.println("Number of file in path " + cases_folder_path + " = " + n);
 
         Tf_idf_Calculator tf = new Tf_idf_Calculator(n);
         tf.nlp_pipeline(tf, n);
