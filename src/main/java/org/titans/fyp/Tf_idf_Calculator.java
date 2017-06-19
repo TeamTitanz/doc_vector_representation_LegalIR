@@ -33,6 +33,7 @@ public class Tf_idf_Calculator {
         try {
             assert reader != null;
             while ((line = reader.readLine()) != null) {
+                line = line.replaceAll("[^\\x00-\\x7F]", "");
                 document = document.concat(line);
             }
         } catch (IOException e) {
