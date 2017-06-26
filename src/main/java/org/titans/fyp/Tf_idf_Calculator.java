@@ -10,7 +10,7 @@ import java.util.*;
 public class Tf_idf_Calculator {
 
     private double[][] t_matrix;
-    private ArrayList<String> vocabulary = new ArrayList<String>();
+    private HashSet<String> vocabulary = new HashSet<String>();
     private String[] document_array;
     StanfordLemmatizer slem = new StanfordLemmatizer();
     public static String cases_folder_path = "./LawIE/DocVector/Cases";
@@ -44,7 +44,7 @@ public class Tf_idf_Calculator {
     }
 
     void add_to_vocabulary(String document, int doc_number) {
-
+        document=document.replace("."," ");
         for (String word : document.split(" ")) {
             if (!vocabulary.contains(word)) {
                 vocabulary.add(word);
@@ -92,24 +92,56 @@ public class Tf_idf_Calculator {
             tf.add_to_vocabulary(text, i);
 
             System.out.println("Document : " + i + " - NLP Pipeline Done");
+            System.out.println("Vocabulary size : "+vocabulary.size());
+            /*if(vocabulary.size()>200000){
+                    printVocab();
+                    System.exit(0);
+            }*/
+
 
         }
 
     }
 
+    private void printVocab(){
+        try{
+            FileWriter fw = new FileWriter("vocab.txt");
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter writer = new PrintWriter(bw);
+            Iterator<String> words=vocabulary.iterator();
+
+
+            while(words.hasNext()){
+
+                writer.println(words.next());
+
+            }
+            writer.close();
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+
+
+
+    }
+
     private void initialize_t_matrix() {
+        System.out.println(vocabulary.size()+" X "+document_array.length);
         t_matrix = new double[vocabulary.size()][document_array.length];
     }
 
     private void fill_t_matrix(int n) {
         int term_count = vocabulary.size();
-
-        for (int i = 0; i < term_count; i++) {
-            String temp = vocabulary.get(i);
+        Iterator<String> itr=vocabulary.iterator();
+        String temp =null;
+        int i=0;
+        while(itr.hasNext()){
+            temp = itr.next();
             for (int j = 0; j < n; j++) {
                 t_matrix[i][j] = calculate_tfidf(temp, document_array[j], document_array);
             }
             System.out.println("term " + (i + 1) + " / " + term_count + " - done");
+            i++;
         }
 
     }
@@ -190,8 +222,11 @@ public class Tf_idf_Calculator {
         TreeMap<String, Double> sorted_map = new TreeMap<String, Double>(bvc);
         String[] p_words = new String[p];
 
-        for (int i = 0; i < vocabulary.size(); i++) {
-            map.put(vocabulary.get(i), calculate_gtfid(vocabulary.get(i), document_array));
+        Iterator<String> itr=vocabulary.iterator();
+        String word=null;
+        while(itr.hasNext()){
+            word=itr.next();
+            map.put(word, calculate_gtfid(word, document_array));
         }
 
         sorted_map.putAll(map);
@@ -271,9 +306,11 @@ public class Tf_idf_Calculator {
         Tf_idf_Calculator tf = new Tf_idf_Calculator(n);
         tf.nlp_pipeline(tf, n);
         System.out.println("NLP Pipeline Done");
+        tf.printVocab();
         tf.initialize_t_matrix();
-        tf.fill_t_matrix(n);
         System.out.println("t_matrix creation done");
+        tf.fill_t_matrix(n);
+        System.out.println("t_matrix filling done");
 
         //serialize t_matrix
         tf.serialize_t_matrix();

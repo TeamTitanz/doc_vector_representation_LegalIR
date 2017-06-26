@@ -5,3 +5,7 @@ src/test/
 target/
 Cases/
 
+TF-IDF-1.0-SNAPSHOT-jar-with-dependencies.jar
+*.ser
+*.ser
+main.jar
