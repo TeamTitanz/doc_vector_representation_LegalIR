@@ -141,16 +141,31 @@ public class Tf_idf_Calculator {
             word=itr.next();
             val=vocabularyBase.get(word);
             if(val!=null){
+               // System.out.println(mean+" "+val);
+               // System.out.println(mean-val);
                 sumOfDev+=Math.pow((mean-val),2);
             }
         }
         double variance=sumOfDev/n;
+        System.out.println("variance: "+variance);
 
         double stDev=Math.sqrt(variance);
+        System.out.println("stDev: "+stDev);
 
-        //68–95–99.7 rule
-        double upperThresh=mean+2*stDev;
-        double lowerThresh=mean-2*stDev;
+
+        double upperThresh=0;
+        double lowerThresh=0;
+        double mult=2;   //68–95–99.7 rule
+
+
+        upperThresh = mean + (mult * stDev);
+        lowerThresh = mean - (mult * stDev);
+
+        if(lowerThresh<0){
+            mult=(mean/stDev); //get the lower threashold to 0
+            upperThresh = mean + (mult * stDev);
+            lowerThresh = mean - (mult * stDev);
+        }
 
 
         itr=vocabularyBase.keySet().iterator();
@@ -163,8 +178,9 @@ public class Tf_idf_Calculator {
                }
             }
         }
-
-
+        System.out.println("lowerThresh: "+lowerThresh);
+        System.out.println("Mean: "+mean);
+        System.out.println("upperThresh: "+upperThresh);
     }
 
 
