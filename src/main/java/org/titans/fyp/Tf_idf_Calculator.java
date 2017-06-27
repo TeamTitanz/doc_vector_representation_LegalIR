@@ -11,6 +11,7 @@ public class Tf_idf_Calculator {
 
     private double[][] t_matrix;
     private HashSet<String> vocabulary = new HashSet<String>();
+    private HashMap<String,Integer> vocabularyBase = new HashMap<String,Integer>();
     private String[] document_array;
     StanfordLemmatizer slem = new StanfordLemmatizer();
     public static String cases_folder_path = "./LawIE/DocVector/Cases";
@@ -45,9 +46,20 @@ public class Tf_idf_Calculator {
 
     void add_to_vocabulary(String document, int doc_number) {
         document=document.replace("."," ");
+        Integer val=null;
         for (String word : document.split(" ")) {
-            if (!vocabulary.contains(word)) {
-                vocabulary.add(word);
+            if(word.length()>1) { //no point in empty string or the alphabet
+                if (!vocabularyBase.keySet().contains(word)) {
+                    vocabularyBase.put(word, 1);
+                } else {
+                    val = vocabularyBase.get(word);
+                    if (val == null) {
+                        val = 0;
+                    }
+                    val++;
+                    vocabularyBase.remove(word);
+                    vocabularyBase.put(word, val);
+                }
             }
         }
 
@@ -92,7 +104,7 @@ public class Tf_idf_Calculator {
             tf.add_to_vocabulary(text, i);
 
             System.out.println("Document : " + i + " - NLP Pipeline Done");
-            System.out.println("Vocabulary size : "+vocabulary.size());
+
             /*if(vocabulary.size()>200000){
                     printVocab();
                     System.exit(0);
@@ -101,7 +113,61 @@ public class Tf_idf_Calculator {
 
         }
 
+        System.out.println("Vocabulary size : "+vocabularyBase.size());
+        simplifyVocabulary();
+        System.out.println("Vocabulary size : "+vocabulary.size());
+
     }
+
+    private void simplifyVocabulary(){
+
+        double n=vocabularyBase.size();
+        double mean=0;
+        Iterator<String> itr=vocabularyBase.keySet().iterator();
+        String word=null;
+        Integer val=null;
+        while(itr.hasNext()){
+            word=itr.next();
+            val=vocabularyBase.get(word);
+            if(val!=null){
+                mean+=val;
+            }
+        }
+        mean=mean/n;
+
+       double sumOfDev=0;
+       itr=vocabularyBase.keySet().iterator();
+        while(itr.hasNext()){
+            word=itr.next();
+            val=vocabularyBase.get(word);
+            if(val!=null){
+                sumOfDev+=Math.pow((mean-val),2);
+            }
+        }
+        double variance=sumOfDev/n;
+
+        double stDev=Math.sqrt(variance);
+
+        //68–95–99.7 rule
+        double upperThresh=mean+2*stDev;
+        double lowerThresh=mean-2*stDev;
+
+
+        itr=vocabularyBase.keySet().iterator();
+        while(itr.hasNext()){
+            word=itr.next();
+            val=vocabularyBase.get(word);
+            if(val!=null){
+               if(val<=upperThresh && val>=lowerThresh){
+                   vocabulary.add(word);
+               }
+            }
+        }
+
+
+    }
+
+
 
     private void printVocab(){
         try{
