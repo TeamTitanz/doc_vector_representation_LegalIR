@@ -34,7 +34,7 @@ public class Tf_idf_Calculator {
         try {
             assert reader != null;
             while ((line = reader.readLine()) != null) {
-                line = line.replaceAll("[^\\x00-\\x7F]", "");
+                line = line.replaceAll("[^a-zA-Z]", " ");
                 document = document.concat(line);
             }
         } catch (IOException e) {
@@ -160,6 +160,20 @@ public class Tf_idf_Calculator {
 
         upperThresh = mean + (mult * stDev);
         lowerThresh = mean - (mult * stDev);
+
+     //   do {
+    //        upperThresh = mean + (mult * stDev);
+     //       lowerThresh = mean - (mult * stDev);
+    //        mult /= 2;
+
+    //    }while(lowerThresh<0);
+
+        //Compansate for the skewedness
+   //     lowerThresh/=2;
+    //     mult=(mean-lowerThresh)/stDev;
+    //   upperThresh = mean + (mult * stDev);
+
+
 
         if(lowerThresh<0){
             mult=(mean/stDev); //get the lower threashold to 0
