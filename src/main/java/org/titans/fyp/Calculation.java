@@ -72,21 +72,6 @@ public class Calculation {
         return docVector;
     }
 
-    public static void main(String[] args) {
-
-        Calculation cal = new Calculation();
-        List<String> p_words_list = cal.getPWordList();
-        ArrayList<String> vocabulary = cal.getVocabulary();
-        double[][] t_matrix = cal.getTMatrix();
-
-        List<List<Double>> document_vector = cal.CalDocumentVector(p_words_list, vocabulary, t_matrix);
-
-        document_vector = cal.normalize_vectors(document_vector);
-        cal.serialize_document_vector(document_vector);
-
-
-    }
-
     private List<List<Double>> normalize_vectors(List<List<Double>> document_vector) {
 
         for (int i = 0; i < document_vector.size(); i++) {
@@ -196,4 +181,36 @@ public class Calculation {
 
         return t_matrix;
     }
+
+    public static void main(String[] args) {
+
+        if (args.length == 2) {
+            Tf_idf_Calculator.serialized_folder = args[0];
+            output_folder = args[1];
+            System.out.println("Serialized Folder = " + Tf_idf_Calculator.serialized_folder);
+            System.out.println("Output Folder = " + output_folder);
+        }
+
+        if (args.length == 3) {
+            Tf_idf_Calculator.cases_folder_path = args[0];
+            Tf_idf_Calculator.serialized_folder = args[1];
+            output_folder = args[2];
+            System.out.println("Cases Folder = " + Tf_idf_Calculator.cases_folder_path);
+            System.out.println("Serialized Folder = " + Tf_idf_Calculator.serialized_folder);
+            System.out.println("Output Folder = " + output_folder);
+        }
+
+        Calculation cal = new Calculation();
+        List<String> p_words_list = cal.getPWordList();
+        ArrayList<String> vocabulary = cal.getVocabulary();
+        double[][] t_matrix = cal.getTMatrix();
+
+        List<List<Double>> document_vector = cal.CalDocumentVector(p_words_list, vocabulary, t_matrix);
+
+        document_vector = cal.normalize_vectors(document_vector);
+        cal.serialize_document_vector(document_vector);
+
+
+    }
+
 }
