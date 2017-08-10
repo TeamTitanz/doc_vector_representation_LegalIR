@@ -49,7 +49,7 @@ public class Calculation {
             StringBuilder sb = new StringBuilder();
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
-                sb.append(sCurrentLine);
+                sb.append(sCurrentLine.toLowerCase());
                 sb.append(" ");
             }
 
