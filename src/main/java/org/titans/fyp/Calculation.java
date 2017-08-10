@@ -2,6 +2,7 @@ package org.titans.fyp;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ public class Calculation {
     public static String output_folder = "./LawIE/DocVector/Output";
 
 
-    public List<List<Double>> CalDocumentVector(List<String> inputWordList, ArrayList<String> vocabulary, double[][] t_matrix) {
+    public List<List<Double>> CalDocumentVector(List<String> inputWordList, HashSet<String> vocabulary, double[][] t_matrix) {
 
         List<List<Double>> DocumentVector = new ArrayList<List<Double>>();
 
@@ -38,7 +39,18 @@ public class Calculation {
         return DocumentVector;
     }
 
-    public List<Double> docVector(String fileName, int docIndex, List<String> inputWordList, ArrayList<String> vocabulary, double[][] t_matrix) {
+    public static int getIndex(HashSet<String> set, String value) {
+        int result = 0;
+        for (String entry : set) {
+            if (entry.equals(value)) {
+                return result;
+            }
+            result++;
+        }
+        return result;
+    }
+
+    public List<Double> docVector(String fileName, int docIndex, List<String> inputWordList, HashSet<String> vocabulary, double[][] t_matrix) {
 
         BufferedReader br = null;
         List<Double> docVector = new ArrayList<Double>();
@@ -56,8 +68,13 @@ public class Calculation {
             String paragraph = sb.toString();
             for (String word : inputWordList) {
                 if (paragraph.contains(word)) {
-                    int index = vocabulary.indexOf(word);
-                    docVector.add(t_matrix[index][docIndex]);
+                    int index = getIndex(vocabulary, word);
+                    try {
+                        docVector.add(t_matrix[index][docIndex]);
+                    } catch (Exception e) {
+                        docVector.add(t_matrix[t_matrix.length - 1][docIndex]);
+                    }
+
                 } else {
                     docVector.add(0.0);
                 }
@@ -132,15 +149,15 @@ public class Calculation {
         return p_words_list;
     }
 
-    private ArrayList<String> getVocabulary() {
-        ArrayList<String> vocabulary = null;
+    private HashSet<String> getVocabulary() {
+        HashSet<String> vocabulary = null;
         try {
             File file = new File(Tf_idf_Calculator.serialized_folder + File.separator + "vocabulary.ser");
             if (file.exists()) {
                 System.out.println("Vocabulary serialized file found. Reading from it");
                 FileInputStream fileIn = new FileInputStream(file);
                 ObjectInputStream in = new ObjectInputStream(fileIn);
-                vocabulary = (ArrayList<String>) in.readObject();
+                vocabulary = (HashSet<String>) in.readObject();
                 in.close();
                 fileIn.close();
             } else {
@@ -202,7 +219,7 @@ public class Calculation {
 
         Calculation cal = new Calculation();
         List<String> p_words_list = cal.getPWordList();
-        ArrayList<String> vocabulary = cal.getVocabulary();
+        HashSet<String> vocabulary = cal.getVocabulary();
         double[][] t_matrix = cal.getTMatrix();
 
         List<List<Double>> document_vector = cal.CalDocumentVector(p_words_list, vocabulary, t_matrix);
