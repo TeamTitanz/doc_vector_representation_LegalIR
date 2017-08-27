@@ -72,7 +72,7 @@ public class Calculation {
                     try {
                         docVector.add(t_matrix[index][docIndex]);
                     } catch (Exception e) {
-                        docVector.add(t_matrix[t_matrix.length - 1][docIndex]);
+                        e.printStackTrace();
                     }
 
                 } else {
