@@ -11,15 +11,16 @@ public class Tf_idf_Calculator {
 
     private double[][] t_matrix;
     private HashSet<String> vocabulary = new HashSet<String>();
-    private HashMap<String,Integer> vocabularyBase = new HashMap<String,Integer>();
-    private String[] document_array;
+    private HashMap<String, Double> vocabularyBase = new HashMap<String, Double>(); //First used as a counter then used to keep idf
+    private HashMap<String, Double> gtfList = new HashMap<String, Double>();
+    private String[][] document_array;
     StanfordLemmatizer slem = new StanfordLemmatizer();
     public static String cases_folder_path = "./LawIE/DocVector/Cases";
     public static String serialized_folder = "./LawIE/DocVector/Serialized_folder";
 
     private Tf_idf_Calculator(int n) {
 
-        document_array = new String[n];
+        document_array = new String[n][];
     }
 
     private String file_reader(String file_name) {
@@ -44,17 +45,22 @@ public class Tf_idf_Calculator {
 
     }
 
+    private String[] breakDocument(String document) {
+        document = document.replace(".", " ");
+        return document.split(" ");
+    }
+
     void add_to_vocabulary(String document, int doc_number) {
         document=document.replace("."," ");
-        Integer val=null;
+        Double val = null;
         for (String word : document.split(" ")) {
             if(word.length()>1) { //no point in empty string or the alphabet
                 if (!vocabularyBase.keySet().contains(word)) {
-                    vocabularyBase.put(word, 1);
+                    vocabularyBase.put(word, 1.0);
                 } else {
                     val = vocabularyBase.get(word);
                     if (val == null) {
-                        val = 0;
+                        val = 0.0;
                     }
                     val++;
                     vocabularyBase.remove(word);
@@ -100,7 +106,7 @@ public class Tf_idf_Calculator {
             List<String> lemmatized_text = slem.lemmatize(document);
             String text = String.join(" ", lemmatized_text);
 
-            document_array[i] = text;
+            document_array[i] = breakDocument(text);
             tf.add_to_vocabulary(text, i);
 
             System.out.println("Document : " + i + " - NLP Pipeline Done");
@@ -125,7 +131,7 @@ public class Tf_idf_Calculator {
         double mean=0;
         Iterator<String> itr=vocabularyBase.keySet().iterator();
         String word=null;
-        Integer val=null;
+        Double val = null;
         while(itr.hasNext()){
             word=itr.next();
             val=vocabularyBase.get(word);
@@ -135,14 +141,14 @@ public class Tf_idf_Calculator {
         }
         mean=mean/n;
 
-       double sumOfDev=0;
-       itr=vocabularyBase.keySet().iterator();
+        double sumOfDev = 0;
+        itr = vocabularyBase.keySet().iterator();
         while(itr.hasNext()){
             word=itr.next();
             val=vocabularyBase.get(word);
             if(val!=null){
-               // System.out.println(mean+" "+val);
-               // System.out.println(mean-val);
+                // System.out.println(mean+" "+val);
+                // System.out.println(mean-val);
                 sumOfDev+=Math.pow((mean-val),2);
             }
         }
@@ -161,22 +167,22 @@ public class Tf_idf_Calculator {
         upperThresh = mean + (mult * stDev);
         lowerThresh = mean - (mult * stDev);
 
-     //   do {
-    //        upperThresh = mean + (mult * stDev);
-     //       lowerThresh = mean - (mult * stDev);
-    //        mult /= 2;
+        //   do {
+        //        upperThresh = mean + (mult * stDev);
+        //       lowerThresh = mean - (mult * stDev);
+        //        mult /= 2;
 
-    //    }while(lowerThresh<0);
+        //    }while(lowerThresh<0);
 
         //Compansate for the skewedness
-   //     lowerThresh/=2;
-    //     mult=(mean-lowerThresh)/stDev;
-    //   upperThresh = mean + (mult * stDev);
+        //     lowerThresh/=2;
+        //     mult=(mean-lowerThresh)/stDev;
+        //   upperThresh = mean + (mult * stDev);
 
 
 
         if(lowerThresh<0){
-            mult=(mean/stDev); //get the lower threashold to 0
+            mult = ((mean - 10) / stDev); //get the lower threashold to 10
             upperThresh = mean + (mult * stDev);
             lowerThresh = mean - (mult * stDev);
         }
@@ -187,9 +193,9 @@ public class Tf_idf_Calculator {
             word=itr.next();
             val=vocabularyBase.get(word);
             if(val!=null){
-               if(val<=upperThresh && val>=lowerThresh){
-                   vocabulary.add(word);
-               }
+                if (val <= upperThresh && val >= lowerThresh) {
+                    vocabulary.add(word);
+                }
             }
         }
         System.out.println("lowerThresh: "+lowerThresh);
@@ -231,21 +237,29 @@ public class Tf_idf_Calculator {
         Iterator<String> itr=vocabulary.iterator();
         String temp =null;
         int i=0;
+        Double tf = null;
+        Double gtf = 0.0;
+        vocabularyBase = new HashMap<String, Double>();
+        ;  //Empty out
         while(itr.hasNext()){
             temp = itr.next();
+            vocabularyBase.put(temp, calc_idf(temp, document_array));  //put idf to be used for gtfidf
             for (int j = 0; j < n; j++) {
-                t_matrix[i][j] = calculate_tfidf(temp, document_array[j], document_array);
+                tf = calc_tf(temp, document_array[j]);
+                gtf += tf;
+                t_matrix[i][j] = tf * vocabularyBase.get(temp);
             }
+            gtfList.put(temp, gtf / n);  //put gtf to be used for gtfidf
             System.out.println("term " + (i + 1) + " / " + term_count + " - done");
             i++;
         }
 
     }
 
-    private double calc_tf(String term, String document) {
+    private double calc_tf(String term, String[] words) {
         double count = 0;
         double word_count = 0;
-        for (String word : document.split(" ")) {
+        for (String word : words) {
             if (term.equals(word)) {
                 count = count + 1;
             }
@@ -254,12 +268,12 @@ public class Tf_idf_Calculator {
         return count / word_count;
     }
 
-    private double calc_idf(String term, String[] corpus) {
+    private double calc_idf(String term, String[][] corpus) {
         double doc_count = corpus.length;
         double count = 0.0;
 
-        for (String document : corpus) {
-            for (String word : document.split(" ")) {
+        for (String[] document : corpus) {
+            for (String word : document) {
                 if (term.equals(word)) {
                     count = count + 1;
                     break;
@@ -270,11 +284,13 @@ public class Tf_idf_Calculator {
         return Math.log(doc_count / count);
     }
 
-    private double calculate_tfidf(String term, String document, String[] corpus) {
-        double tf = calc_tf(term, document);
+    /*
+    private double calculate_tfidf(String term, int j, String[][] corpus) {
+        double tf = calc_tf(term, corpus[j]);
         double idf = calc_idf(term, corpus);
         return tf * idf;
     }
+    */
 
     private void serialize_t_matrix() {
         try {
@@ -295,7 +311,8 @@ public class Tf_idf_Calculator {
         }
     }
 
-    private double calc_gtf(String term, String[] corpus) {
+    /*
+    private double calc_gtf(String term, String[][] corpus) {
         double sum = 0.0;
         double n = document_array.length;
         for (int i = 0; i < n; i++) {
@@ -303,10 +320,11 @@ public class Tf_idf_Calculator {
         }
         return sum / n;
     }
+    */
 
-    private double calculate_gtfid(String term, String[] corpus) {
-        double gtf = calc_gtf(term, corpus);
-        double idf = calc_idf(term, corpus);
+    private double calculate_gtfid(String term) {
+        double gtf = gtfList.get(term);
+        double idf = vocabularyBase.get(term);
 
         return gtf * idf;
     }
@@ -322,7 +340,7 @@ public class Tf_idf_Calculator {
         String word=null;
         while(itr.hasNext()){
             word=itr.next();
-            map.put(word, calculate_gtfid(word, document_array));
+            map.put(word, calculate_gtfid(word));
         }
 
         sorted_map.putAll(map);
