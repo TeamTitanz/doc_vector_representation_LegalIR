@@ -2,6 +2,7 @@ package org.titans.fyp;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -16,24 +17,25 @@ public class Calculation {
 
     public List<List<Double>> CalDocumentVector(List<String> inputWordList, HashSet<String> vocabulary, double[][] t_matrix) {
 
+        File folder = new File(output_folder);
+        File[] fileList = folder.listFiles();
+        int n = fileList.length;
+        String[] fileNames = new String[n];
+
+        for (int i = 0; i < fileList.length; i++) {
+            String full_name = fileList[i].toString();
+            int start_index = full_name.lastIndexOf(File.separator);
+            int end_index = full_name.lastIndexOf('.');
+            fileNames[i] = full_name.substring(start_index + 1, end_index);
+//            System.out.println(fileNames[i]);
+        }
+        Arrays.sort(fileNames);
+
         List<List<Double>> DocumentVector = new ArrayList<List<Double>>();
 
-        File f = new File(output_folder);
-        FilenameFilter textFilter = new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.toLowerCase().endsWith(".txt");
-            }
-        };
-
-        File[] files = f.listFiles(textFilter);
-        for (int docIndex = 0; docIndex < files.length; docIndex++) {
-            try {
-                String fileName = (files[docIndex]).getCanonicalPath();
+        for (int docIndex = 0; docIndex < fileNames.length; docIndex++) {
+            String fileName = output_folder + File.separator + fileNames[docIndex] + ".txt";
                 DocumentVector.add(docVector(fileName, docIndex, inputWordList, vocabulary, t_matrix));
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
 
         return DocumentVector;
@@ -89,7 +91,7 @@ public class Calculation {
         return docVector;
     }
 
-    private List<List<Double>> normalize_vectors(List<List<Double>> document_vector) {
+    public List<List<Double>> normalize_vectors(List<List<Double>> document_vector) {
 
         for (int i = 0; i < document_vector.size(); i++) {
             Double sum = 0.0;
@@ -105,7 +107,7 @@ public class Calculation {
         return document_vector;
     }
 
-    private void serialize_document_vector(List<List<Double>> document_vector) {
+    public void serialize_document_vector(List<List<Double>> document_vector) {
         try {
             FileOutputStream fileOut =
                     new FileOutputStream(Tf_idf_Calculator.serialized_folder + File.separator + "document_vector.ser");
