@@ -437,7 +437,21 @@ public class Tf_idf_Calculator {
         tf.serialize_p_list(p_words_list);
         tf.serialize_vocabulary();
 
+        // Calculate document vector
+        Calculation cal = new Calculation();
+        List<List<Double>> document_vector = cal.CalDocumentVector(p_words_list, tf.getVocabulary(), tf.getT_matrix());
+        document_vector = cal.normalize_vectors(document_vector);
+        cal.serialize_document_vector(document_vector);
 
+
+    }
+
+    public double[][] getT_matrix() {
+        return t_matrix;
+    }
+
+    public HashSet<String> getVocabulary() {
+        return vocabulary;
     }
 
     class ValueComparator implements Comparator<String> {
