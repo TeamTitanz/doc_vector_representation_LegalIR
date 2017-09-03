@@ -13,6 +13,7 @@ import java.util.List;
 public class Calculation {
 
     public static String output_folder = "./LawIE/DocVector/Output";
+    StanfordLemmatizer slem = new StanfordLemmatizer();
 
 
     public List<List<Double>> CalDocumentVector(List<String> inputWordList, HashSet<String> vocabulary, double[][] t_matrix) {
@@ -54,7 +55,7 @@ public class Calculation {
 
     public List<Double> docVector(String fileName, int docIndex, List<String> inputWordList, HashSet<String> vocabulary, double[][] t_matrix) {
 
-        BufferedReader br = null;
+        BufferedReader br;
         List<Double> docVector = new ArrayList<Double>();
 
         try {
@@ -63,13 +64,16 @@ public class Calculation {
             StringBuilder sb = new StringBuilder();
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
-                sb.append(sCurrentLine.toLowerCase());
-                sb.append(" ");
+                sb.append(sCurrentLine);
+                sb.append(" \n");
             }
 
             String paragraph = sb.toString();
+            List<String> lemmatized_text = slem.lemmatize(paragraph);
+            String lemmatized_paragraph = String.join(" ", lemmatized_text);
+
             for (String word : inputWordList) {
-                if (paragraph.contains(word)) {
+                if (lemmatized_paragraph.contains(word)) {
                     int index = getIndex(vocabulary, word);
                     try {
                         docVector.add(t_matrix[index][docIndex]);
