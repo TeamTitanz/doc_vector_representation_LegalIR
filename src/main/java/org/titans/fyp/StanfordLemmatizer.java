@@ -44,7 +44,15 @@ public class StanfordLemmatizer {
             for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
                 // Retrieve and add the lemma for each word into the
                 // list of lemmas
-                lemmas.add(token.get(LemmaAnnotation.class));
+                String temWord = token.get(LemmaAnnotation.class);
+                try {
+                    temWord = temWord.replaceAll("[^a-zA-Z]", " ");
+                    if (temWord.length() > 0 && !(temWord.equals(" "))) {
+                        lemmas.add(temWord.toLowerCase());
+                    }
+                } catch (Exception e) {
+                    // Do nothing
+                }
             }
         }
         return lemmas;
