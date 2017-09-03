@@ -35,8 +35,7 @@ public class Tf_idf_Calculator {
         try {
             assert reader != null;
             while ((line = reader.readLine()) != null) {
-                line = line.replaceAll("[^a-zA-Z]", " ");
-                document = document.concat(line);
+                document = document.concat(line + " \n");
             }
         } catch (IOException e) {
             e.printStackTrace();
