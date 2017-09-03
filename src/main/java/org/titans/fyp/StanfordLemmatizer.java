@@ -32,6 +32,10 @@ public class StanfordLemmatizer {
     }
 
     public List<String> lemmatize(String documentText) {
+
+        // Removing non ascii characters (Those characters can't handle by lemmatizer.)
+        documentText = documentText.replaceAll("[^\\x00-\\x7F]", "");
+
         List<String> lemmas = new LinkedList<String>();
         // Create an empty Annotation just with the given text
         Annotation document = new Annotation(documentText);
