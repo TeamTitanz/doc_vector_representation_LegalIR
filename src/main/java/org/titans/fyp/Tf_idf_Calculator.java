@@ -50,10 +50,10 @@ public class Tf_idf_Calculator {
     }
 
     void add_to_vocabulary(String document, int doc_number) {
-        document=document.replace("."," ");
+        document = document.replace(".", " ");
         Double val = null;
         for (String word : document.split(" ")) {
-            if(word.length()>1) { //no point in empty string or the alphabet
+            if (word.length() > 1) { //no point in empty string or the alphabet
                 if (!vocabularyBase.keySet().contains(word)) {
                     vocabularyBase.put(word, 1.0);
                 } else {
@@ -118,49 +118,49 @@ public class Tf_idf_Calculator {
 
         }
 
-        System.out.println("Vocabulary size : "+vocabularyBase.size());
+        System.out.println("Vocabulary size : " + vocabularyBase.size());
         simplifyVocabulary();
-        System.out.println("Vocabulary size : "+vocabulary.size());
+        System.out.println("Vocabulary size : " + vocabulary.size());
 
     }
 
-    private void simplifyVocabulary(){
+    private void simplifyVocabulary() {
 
-        double n=vocabularyBase.size();
-        double mean=0;
-        Iterator<String> itr=vocabularyBase.keySet().iterator();
-        String word=null;
+        double n = vocabularyBase.size();
+        double mean = 0;
+        Iterator<String> itr = vocabularyBase.keySet().iterator();
+        String word = null;
         Double val = null;
-        while(itr.hasNext()){
-            word=itr.next();
-            val=vocabularyBase.get(word);
-            if(val!=null){
-                mean+=val;
+        while (itr.hasNext()) {
+            word = itr.next();
+            val = vocabularyBase.get(word);
+            if (val != null) {
+                mean += val;
             }
         }
-        mean=mean/n;
+        mean = mean / n;
 
         double sumOfDev = 0;
         itr = vocabularyBase.keySet().iterator();
-        while(itr.hasNext()){
-            word=itr.next();
-            val=vocabularyBase.get(word);
-            if(val!=null){
+        while (itr.hasNext()) {
+            word = itr.next();
+            val = vocabularyBase.get(word);
+            if (val != null) {
                 // System.out.println(mean+" "+val);
                 // System.out.println(mean-val);
-                sumOfDev+=Math.pow((mean-val),2);
+                sumOfDev += Math.pow((mean - val), 2);
             }
         }
-        double variance=sumOfDev/n;
-        System.out.println("variance: "+variance);
+        double variance = sumOfDev / n;
+        System.out.println("variance: " + variance);
 
-        double stDev=Math.sqrt(variance);
-        System.out.println("stDev: "+stDev);
+        double stDev = Math.sqrt(variance);
+        System.out.println("stDev: " + stDev);
 
 
-        double upperThresh=0;
-        double lowerThresh=0;
-        double mult=2;   //68–95–99.7 rule
+        double upperThresh = 0;
+        double lowerThresh = 0;
+        double mult = 2;   //68–95–99.7 rule
 
 
         upperThresh = mean + (mult * stDev);
@@ -179,40 +179,37 @@ public class Tf_idf_Calculator {
         //   upperThresh = mean + (mult * stDev);
 
 
-
-        if(lowerThresh<0){
+        if (lowerThresh < 0) {
             mult = ((mean - 10) / stDev); //get the lower threashold to 10
             upperThresh = mean + (mult * stDev);
             lowerThresh = mean - (mult * stDev);
         }
 
 
-        itr=vocabularyBase.keySet().iterator();
-        while(itr.hasNext()){
-            word=itr.next();
-            val=vocabularyBase.get(word);
-            if(val!=null){
+        itr = vocabularyBase.keySet().iterator();
+        while (itr.hasNext()) {
+            word = itr.next();
+            val = vocabularyBase.get(word);
+            if (val != null) {
                 if (val <= upperThresh && val >= lowerThresh) {
                     vocabulary.add(word);
                 }
             }
         }
-        System.out.println("lowerThresh: "+lowerThresh);
-        System.out.println("Mean: "+mean);
-        System.out.println("upperThresh: "+upperThresh);
+        System.out.println("lowerThresh: " + lowerThresh);
+        System.out.println("Mean: " + mean);
+        System.out.println("upperThresh: " + upperThresh);
     }
 
-
-
-    private void printVocab(){
-        try{
+    private void printVocab() {
+        try {
             FileWriter fw = new FileWriter("vocab.txt");
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter writer = new PrintWriter(bw);
-            Iterator<String> words=vocabulary.iterator();
+            Iterator<String> words = vocabulary.iterator();
 
 
-            while(words.hasNext()){
+            while (words.hasNext()) {
 
                 writer.println(words.next());
 
@@ -223,24 +220,23 @@ public class Tf_idf_Calculator {
         }
 
 
-
     }
 
     private void initialize_t_matrix() {
-        System.out.println(vocabulary.size()+" X "+document_array.length);
+        System.out.println(vocabulary.size() + " X " + document_array.length);
         t_matrix = new double[vocabulary.size()][document_array.length];
     }
 
     private void fill_t_matrix(int n) {
         int term_count = vocabulary.size();
-        Iterator<String> itr=vocabulary.iterator();
-        String temp =null;
-        int i=0;
+        Iterator<String> itr = vocabulary.iterator();
+        String temp = null;
+        int i = 0;
         Double tf = null;
         Double gtf = 0.0;
         vocabularyBase = new HashMap<String, Double>();
         ;  //Empty out
-        while(itr.hasNext()){
+        while (itr.hasNext()) {
             temp = itr.next();
             vocabularyBase.put(temp, calc_idf(temp, document_array));  //put idf to be used for gtfidf
             for (int j = 0; j < n; j++) {
@@ -330,29 +326,58 @@ public class Tf_idf_Calculator {
 
     private List<String> get_top_p_words(int p) {
 
-        HashMap<String, Double> map = new HashMap<String, Double>();
-        ValueComparator bvc = new ValueComparator(map);
-        TreeMap<String, Double> sorted_map = new TreeMap<String, Double>(bvc);
+        WordValue sorted_map[] = new WordValue[vocabulary.size()];
+        Iterator<String> itr = vocabulary.iterator();
+
+        int index = 0;
+        while (itr.hasNext()) {
+            String word = itr.next();
+            sorted_map[index++] = new WordValue(word, calculate_gtfid(word));
+        }
+
+        Arrays.sort(sorted_map, new ValueComparator());
+
         String[] p_words = new String[p];
-
-        Iterator<String> itr=vocabulary.iterator();
-        String word=null;
-        while(itr.hasNext()){
-            word=itr.next();
-            map.put(word, calculate_gtfid(word));
+        for (int count = 0; count < p; count++) {
+            p_words[count] = sorted_map[count].getWord();
         }
 
-        sorted_map.putAll(map);
+        return Arrays.asList(p_words);
 
-        int count = 0;
-        for (Map.Entry<String, Double> entry : sorted_map.entrySet()) {
-            if (count >= p) break;
+    }
 
-            p_words[count] = entry.getKey();
-            count++;
+    class WordValue {
+        private String word;
+        private double value;
+
+        public WordValue(String word, double value) {
+            this.word = word;
+            this.value = value;
         }
-        List<String> p_word_list = Arrays.asList(p_words);
-        return p_word_list;
+
+        public String getWord() {
+            return word;
+        }
+
+        public double getValue() {
+            return value;
+        }
+    }
+
+    class ValueComparator implements Comparator<WordValue> {
+
+        @Override
+        public int compare(WordValue o1, WordValue o2) {
+            // descending order
+            double tem = o2.getValue() - o1.getValue();
+            if (tem < 0) {
+                return -1;
+            } else if (tem == 0.0) {
+                return 0;
+            } else {
+                return 1;
+            }
+        }
 
     }
 
@@ -436,24 +461,6 @@ public class Tf_idf_Calculator {
         tf.serialize_p_list(p_words_list);
         tf.serialize_vocabulary();
 
-
     }
 
-    class ValueComparator implements Comparator<String> {
-        Map<String, Double> base;
-
-        public ValueComparator(Map<String, Double> base) {
-            this.base = base;
-        }
-
-        // Note: this comparator imposes orderings that are inconsistent with
-        // equals.
-        public int compare(String a, String b) {
-            if (base.get(a) >= base.get(b)) {
-                return -1;
-            } else {
-                return 1;
-            } // returning 0 would merge keys
-        }
-    }
 }
