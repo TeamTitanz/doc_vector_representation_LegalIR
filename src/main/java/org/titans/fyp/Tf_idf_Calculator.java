@@ -2,6 +2,8 @@ package org.titans.fyp;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by Keetmalin on 6/13/2017
@@ -253,14 +255,19 @@ public class Tf_idf_Calculator {
 
     private double calc_tf(String term, String[] words) {
         double count = 0;
-        double word_count = 0;
         for (String word : words) {
             if (term.equals(word)) {
                 count = count + 1;
             }
-            word_count = word_count + 1;
         }
-        return count / word_count;
+
+        double most_occurring_term_value = Stream.of(words)
+                .collect(Collectors.groupingBy(s -> s, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .max(Comparator.comparing(Map.Entry::getValue)).get().getValue();
+
+        return 0.5 + (0.5 * (count / most_occurring_term_value));
     }
 
     private double calc_idf(String term, String[][] corpus) {
