@@ -232,13 +232,15 @@ public class Tf_idf_Calculator {
     private void fill_t_matrix(int n) {
         int term_count = vocabulary.size();
         Iterator<String> itr = vocabulary.iterator();
-        String temp = null;
+        String temp;
         int i = 0;
-        Double tf = null;
-        Double gtf = 0.0;
+        double tf;
+        double gtf;
         vocabularyBase = new HashMap<String, Double>();
-        ;  //Empty out
+
+        // Empty out
         while (itr.hasNext()) {
+            gtf = 0.0;
             temp = itr.next();
             vocabularyBase.put(temp, calc_idf(temp, document_array));  //put idf to be used for gtfidf
             for (int j = 0; j < n; j++) {
