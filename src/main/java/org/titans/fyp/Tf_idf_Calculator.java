@@ -280,7 +280,6 @@ public class Tf_idf_Calculator {
             for (String word : document) {
                 if (term.equals(word)) {
                     count = count + 1;
-                    break;
                 }
             }
         }
