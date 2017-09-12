@@ -273,18 +273,20 @@ public class Tf_idf_Calculator {
     }
 
     private double calc_idf(String term, String[][] corpus) {
-        double doc_count = corpus.length;
-        double count = 0.0;
+        return Math.log10(corpus.length / doc_count_for_term(term, corpus));
+    }
 
+    private double doc_count_for_term(String term, String[][] corpus) {
+        double no_doc_count = 0.0;
         for (String[] document : corpus) {
             for (String word : document) {
                 if (term.equals(word)) {
-                    count = count + 1;
+                    no_doc_count += 1;
+                    break;
                 }
             }
         }
-
-        return Math.log(doc_count / count);
+        return no_doc_count;
     }
 
     /*
