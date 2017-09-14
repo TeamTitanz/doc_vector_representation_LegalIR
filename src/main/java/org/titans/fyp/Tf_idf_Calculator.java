@@ -230,29 +230,95 @@ public class Tf_idf_Calculator {
     }
 
     private void fill_t_matrix(int n) {
-        int term_count = vocabulary.size();
+
         Iterator<String> itr = vocabulary.iterator();
         String temp;
         int i = 0;
-        double tf;
-        double gtf;
         vocabularyBase = new HashMap<String, Double>();
 
         // Empty out
         while (itr.hasNext()) {
-            gtf = 0.0;
             temp = itr.next();
             vocabularyBase.put(temp, calc_idf(temp, document_array));  //put idf to be used for gtfidf
+            i++;
+        }
+        scaling_idf();
+
+        int term_count = vocabulary.size();
+        itr = vocabulary.iterator();
+        i = 0;
+        double tf;
+        double gtf;
+        while (itr.hasNext()) {
+
+            gtf = 0.0;
+            temp = itr.next();
             for (int j = 0; j < n; j++) {
                 tf = calc_tf(temp, document_array[j]);
                 gtf += tf;
                 t_matrix[i][j] = tf * vocabularyBase.get(temp);
             }
             gtfList.put(temp, gtf / n);  //put gtf to be used for gtfidf
+
             System.out.println("term " + (i + 1) + " / " + term_count + " - done");
             i++;
         }
+        scaling_gtf();
 
+    }
+
+    private void scaling_gtf() {
+
+        double gtfList_min = 1;
+        double gtfList_max = 0;
+        for (Map.Entry<String, Double> entry : gtfList.entrySet()) {
+            double value = entry.getValue();
+            if (gtfList_min > value) {
+                gtfList_min = value;
+            }
+
+            if (gtfList_max < value) {
+                gtfList_max = value;
+            }
+        }
+        System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\t" + gtfList_min + "\t" + gtfList_max);
+
+
+        HashMap<String, Double> new_gtfList = new HashMap<String, Double>();
+        for (Map.Entry<String, Double> entry : gtfList.entrySet()) {
+            double current_value = entry.getValue();
+            double scaled_value = (current_value - gtfList_min) / (gtfList_max - gtfList_min);
+            new_gtfList.put(entry.getKey(), scaled_value);
+        }
+        gtfList.clear();
+        gtfList = new_gtfList;
+
+    }
+
+    private void scaling_idf() {
+
+        double vocabularyBase_min = 1;
+        double vocabularyBase_max = 0;
+        for (Map.Entry<String, Double> entry : vocabularyBase.entrySet()) {
+            double value = entry.getValue();
+            if (vocabularyBase_min > value) {
+                vocabularyBase_min = value;
+            }
+
+            if (vocabularyBase_max < value) {
+                vocabularyBase_max = value;
+            }
+        }
+        System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\t" + vocabularyBase_min + "\t" + vocabularyBase_max);
+
+        HashMap<String, Double> new_vocabularyBase = new HashMap<String, Double>();
+        for (Map.Entry<String, Double> entry : vocabularyBase.entrySet()) {
+            double current_value = entry.getValue();
+            double scaled_value = (current_value - vocabularyBase_min) / (vocabularyBase_max - vocabularyBase_min);
+            new_vocabularyBase.put(entry.getKey(), scaled_value);
+        }
+        vocabularyBase.clear();
+        vocabularyBase = new_vocabularyBase;
     }
 
     private double calc_tf(String term, String[] words) {
