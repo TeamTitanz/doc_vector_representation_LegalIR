@@ -281,17 +281,45 @@ public class Tf_idf_Calculator {
                 gtfList_max = value;
             }
         }
-        System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\t" + gtfList_min + "\t" + gtfList_max);
+        System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& gtfList min & max" + gtfList_min + "\t" + gtfList_max);
+//        Remove the ones X s.t : X >mean+sigma || X <mean - sigma
 
 
+        double sum1 = 0.0;    // sum of the numbers
+        double sum2 = 0.0;    // sum of the squares
         HashMap<String, Double> new_gtfList = new HashMap<String, Double>();
         for (Map.Entry<String, Double> entry : gtfList.entrySet()) {
             double current_value = entry.getValue();
             double scaled_value = (current_value - gtfList_min) / (gtfList_max - gtfList_min);
             new_gtfList.put(entry.getKey(), scaled_value);
+
+            sum1 += scaled_value;
+            sum2 += scaled_value * scaled_value;
         }
+
         gtfList.clear();
-        gtfList = new_gtfList;
+        double count = new_gtfList.size();
+        double mean = sum1 / count;
+        double variance = (count * sum2 - sum1 * sum1) / (count * count);
+        double sigma = Math.sqrt(variance);
+
+        System.out.println("GTF -> (mean)" + mean);
+        System.out.println("GTF -> (sigma)" + sigma);
+        System.out.println("GTF -> (mean + sigma)" + (mean + sigma));
+        System.out.println("GTF -> (mean - sigma)" + (mean - sigma));
+
+        for (Map.Entry<String, Double> entry : new_gtfList.entrySet()) {
+            double current_value = entry.getValue();
+
+            if (current_value > (mean + sigma)) {
+                current_value = 0;
+            }
+            if (current_value < (mean - sigma)) {
+                current_value = 0;
+            }
+            gtfList.put(entry.getKey(), current_value);
+        }
+        new_gtfList.clear();
 
     }
 
@@ -309,19 +337,47 @@ public class Tf_idf_Calculator {
                 vocabularyBase_max = value;
             }
         }
-        System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\t" + vocabularyBase_min + "\t" + vocabularyBase_max);
+        System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& vocabularyBase min & max\t" + vocabularyBase_min + "\t" + vocabularyBase_max);
 
+        double sum1 = 0.0;    // sum of the numbers
+        double sum2 = 0.0;    // sum of the squares
         HashMap<String, Double> new_vocabularyBase = new HashMap<String, Double>();
         for (Map.Entry<String, Double> entry : vocabularyBase.entrySet()) {
             double current_value = entry.getValue();
             double scaled_value = (current_value - vocabularyBase_min) / (vocabularyBase_max - vocabularyBase_min);
             new_vocabularyBase.put(entry.getKey(), scaled_value);
+
+            sum1 += scaled_value;
+            sum2 += scaled_value * scaled_value;
         }
+
         vocabularyBase.clear();
-        vocabularyBase = new_vocabularyBase;
+        double count = new_vocabularyBase.size();
+        double mean = sum1 / count;
+        double variance = (count * sum2 - sum1 * sum1) / (count * count);
+        double sigma = Math.sqrt(variance);
+
+        System.out.println("IDF -> (mean)" + mean);
+        System.out.println("IDF -> (sigma)" + sigma);
+        System.out.println("IDF -> (mean + sigma)" + (mean + sigma));
+        System.out.println("IDF -> (mean - sigma)" + (mean - sigma));
+
+        for (Map.Entry<String, Double> entry : new_vocabularyBase.entrySet()) {
+            double current_value = entry.getValue();
+
+            if (current_value > (mean + sigma)) {
+                current_value = 0;
+            }
+            if (current_value < (mean - sigma)) {
+                current_value = 0;
+            }
+            vocabularyBase.put(entry.getKey(), current_value);
+        }
+        new_vocabularyBase.clear();
     }
 
     private double calc_tf(String term, String[] words) {
+
         double count = 0;
         for (String word : words) {
             if (term.equals(word)) {
@@ -396,7 +452,7 @@ public class Tf_idf_Calculator {
     private double calculate_gtfid(String term) {
         double gtf = gtfList.get(term);
         double idf = vocabularyBase.get(term);
-
+//        System.out.print(gtf + "," + idf);
         return gtf * idf;
     }
 
@@ -406,17 +462,46 @@ public class Tf_idf_Calculator {
         Iterator<String> itr = vocabulary.iterator();
 
         int index = 0;
+//        System.out.println("\n\n\nWords unsorted.............................................");
         while (itr.hasNext()) {
             String word = itr.next();
-            sorted_map[index++] = new WordValue(word, calculate_gtfid(word));
+
+//            System.out.print(word + ",");
+            double temp = calculate_gtfid(word);
+//            System.out.print("," + temp + "\n");
+
+            sorted_map[index++] = new WordValue(word, temp);
         }
+//        System.out.println("Words unsorted...............................................\n\n\n");
 
         Arrays.sort(sorted_map, new ValueComparator());
 
+//        System.out.println("\n\n\nSize: " + sorted_map.length);
+//        System.out.println("Words Start.............................................");
+//        for (int count = 0; count < sorted_map.length; count++) {
+//            System.out.println(sorted_map[count].getWord() + " :- " + sorted_map[count].getValue());
+//        }
+//        System.out.println("Words End...............................................\n\n\n");
+
         String[] p_words = new String[p];
+//        System.out.println("Size: " + p_words.length);
+//        System.out.println("P_Words Start.............................................");
         for (int count = 0; count < p; count++) {
-            p_words[count] = sorted_map[count].getWord();
+            String term = sorted_map[count].getWord();
+            p_words[count] = term;
+            int no_doc_count = 0;
+            for (String[] document : document_array) {
+                for (String word : document) {
+                    if (term.equals(word)) {
+                        no_doc_count += 1;
+                        break;
+                    }
+                }
+            }
+
+//            System.out.println(term + "," + sorted_map[count].getValue() + "," + no_doc_count);
         }
+//        System.out.println("\nP_Words End...............................................");
 
         return Arrays.asList(p_words);
 
