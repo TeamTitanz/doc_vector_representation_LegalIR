@@ -21,7 +21,7 @@ public class PList {
 
         List<String>  docVector = null;
         try {
-            File file = new File("D:\\Project\\fyp\\word2vec\\code\\work8\\up2\\doc_vector_representation_LegalIR\\Serialized_folder\\p_list.ser");
+            File file = new File("D:\\Project\\fyp\\word2vec\\code\\work8\\up4\\doc_vector_representation_LegalIR\\Serialized_folder\\p_list.ser");
             if (file.exists()) {
                 System.out.println("serialized file found. Reading from it");
                 FileInputStream fileIn = new FileInputStream(file);

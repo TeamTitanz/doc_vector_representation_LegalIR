@@ -19,26 +19,26 @@ public class DocumentVector {
         for (List<Double> a : docVector) {
             int index = 0;
             for (double b : a) {
-                System.out.print(b + " ");
+//                System.out.print(b + " ");
                 if (b != 0.0) {
 //                    System.out.println(b);
                 }
                 vec[index++] += b;
             }
-            System.out.println();
+//            System.out.println();
         }
 
-//        int oCount = 0;
-//        for (double val : vec) {
-//            System.out.print(val + ", ");
-//            if (val == 0.0) {
-//                oCount++;
-//            }
-//        }
-//
-//        System.out.println("\nMin Value: " + getMinValue(vec));
-//        System.out.println("Max Value: " + getMaxValue(vec));
-//        System.out.println("Zero Count = " + oCount);
+        int oCount = 0;
+        for (double val : vec) {
+            System.out.print(val + ", ");
+            if (val == 0.0) {
+                oCount++;
+            }
+        }
+
+        System.out.println("\nMin Value: " + getMinValue(vec));
+        System.out.println("Max Value: " + getMaxValue(vec));
+        System.out.println("Zero Count = " + oCount);
 
     }
 
@@ -69,7 +69,7 @@ public class DocumentVector {
 
         List<List<Double>> docVector = null;
         try {
-            File file = new File("D:\\Project\\fyp\\word2vec\\code\\work8\\up2\\doc_vector_representation_LegalIR\\Serialized_folder\\document_vector.ser");
+            File file = new File("D:\\Project\\fyp\\word2vec\\code\\work8\\up4\\doc_vector_representation_LegalIR\\Serialized_folder\\document_vector.ser");
             if (file.exists()) {
                 System.out.println("serialized file found. Reading from it");
                 FileInputStream fileIn = new FileInputStream(file);
