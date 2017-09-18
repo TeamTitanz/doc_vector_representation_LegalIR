@@ -7,11 +7,11 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * Created by Keetmalin on 6/13/2017
- * Project - doc_vector_representation_LegalIR
+ * Created by Buddhi on 9/18/2017.
  */
-public class Calculation {
+public class Tf_Idf_Calculator_Part3 {
 
+    public static String serialized_folder = "./LawIE/DocVector/Serialized_folder";
     public static String output_folder = "./LawIE/DocVector/Output";
     StanfordLemmatizer slem = new StanfordLemmatizer();
 
@@ -36,7 +36,7 @@ public class Calculation {
 
         for (int docIndex = 0; docIndex < fileNames.length; docIndex++) {
             String fileName = output_folder + File.separator + fileNames[docIndex] + ".txt";
-                DocumentVector.add(docVector(fileName, docIndex, inputWordList, vocabulary, t_matrix));
+            DocumentVector.add(docVector(fileName, docIndex, inputWordList, vocabulary, t_matrix));
         }
 
         return DocumentVector;
@@ -114,13 +114,13 @@ public class Calculation {
     public void serialize_document_vector(List<List<Double>> document_vector) {
         try {
             FileOutputStream fileOut =
-                    new FileOutputStream(Tf_idf_Calculator.serialized_folder + File.separator + "document_vector.ser");
+                    new FileOutputStream(serialized_folder + File.separator + "document_vector.ser");
 
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(document_vector);
             out.close();
             fileOut.close();
-            System.out.printf("Serialized data is saved in " + Tf_idf_Calculator.serialized_folder + File.separator + "document_vector.ser");
+            System.out.printf("Serialized data is saved in " + serialized_folder + File.separator + "document_vector.ser");
 
 
         } catch (FileNotFoundException e) {
@@ -133,16 +133,16 @@ public class Calculation {
     private List<String> getPWordList() {
         List<String> p_words_list = null;
         try {
-            File file = new File(Tf_idf_Calculator.serialized_folder + File.separator + "p_list.ser");
+            File file = new File(serialized_folder + File.separator + "p_list.ser");
             if (file.exists()) {
-                System.out.println("P_LIST serialized file found. Reading from it");
+                System.out.println("p_list serialized file found. Reading from it");
                 FileInputStream fileIn = new FileInputStream(file);
                 ObjectInputStream in = new ObjectInputStream(fileIn);
                 p_words_list = (List<String>) in.readObject();
                 in.close();
                 fileIn.close();
             } else {
-                System.out.println("P_LIST word serlized file not found in" + Tf_idf_Calculator.serialized_folder + File.separator + "p_list.ser");
+                System.out.println("p_list word serlized file not found in " + serialized_folder + File.separator + "p_list.ser");
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -158,7 +158,7 @@ public class Calculation {
     private HashSet<String> getVocabulary() {
         HashSet<String> vocabulary = null;
         try {
-            File file = new File(Tf_idf_Calculator.serialized_folder + File.separator + "vocabulary.ser");
+            File file = new File(serialized_folder + File.separator + "vocabulary.ser");
             if (file.exists()) {
                 System.out.println("Vocabulary serialized file found. Reading from it");
                 FileInputStream fileIn = new FileInputStream(file);
@@ -167,7 +167,7 @@ public class Calculation {
                 in.close();
                 fileIn.close();
             } else {
-                System.out.println("Vocabulary serialized file not found in " + Tf_idf_Calculator.serialized_folder + File.separator + "vocabulary.ser");
+                System.out.println("Vocabulary serialized file not found in " + serialized_folder + File.separator + "vocabulary.ser");
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -183,7 +183,7 @@ public class Calculation {
     private double[][] getTMatrix() {
         double[][] t_matrix = null;
         try {
-            File file = new File(Tf_idf_Calculator.serialized_folder + File.separator + "t_matrix.ser");
+            File file = new File(serialized_folder + File.separator + "t_matrix.ser");
             if (file.exists()) {
                 System.out.println("t_matrix serialized file found. Reading from it");
                 FileInputStream fileIn = new FileInputStream(file);
@@ -192,7 +192,7 @@ public class Calculation {
                 in.close();
                 fileIn.close();
             } else {
-                System.out.println("t_matrix serialized file not found in " + Tf_idf_Calculator.serialized_folder + File.separator + "t_matrix.ser");
+                System.out.println("t_matrix serialized file not found in " + serialized_folder + File.separator + "t_matrix.ser");
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -208,22 +208,13 @@ public class Calculation {
     public static void main(String[] args) {
 
         if (args.length == 2) {
-            Tf_idf_Calculator.serialized_folder = args[0];
+            serialized_folder = args[0];
             output_folder = args[1];
-            System.out.println("Serialized Folder = " + Tf_idf_Calculator.serialized_folder);
+            System.out.println("Serialized Folder = " + serialized_folder);
             System.out.println("Output Folder = " + output_folder);
         }
 
-        if (args.length == 3) {
-            Tf_idf_Calculator.cases_folder_path = args[0];
-            Tf_idf_Calculator.serialized_folder = args[1];
-            output_folder = args[2];
-            System.out.println("Cases Folder = " + Tf_idf_Calculator.cases_folder_path);
-            System.out.println("Serialized Folder = " + Tf_idf_Calculator.serialized_folder);
-            System.out.println("Output Folder = " + output_folder);
-        }
-
-        Calculation cal = new Calculation();
+        Tf_Idf_Calculator_Part3 cal = new Tf_Idf_Calculator_Part3();
         List<String> p_words_list = cal.getPWordList();
         HashSet<String> vocabulary = cal.getVocabulary();
         double[][] t_matrix = cal.getTMatrix();
@@ -232,7 +223,6 @@ public class Calculation {
 
         document_vector = cal.normalize_vectors(document_vector);
         cal.serialize_document_vector(document_vector);
-
 
     }
 
