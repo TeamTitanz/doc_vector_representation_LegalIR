@@ -580,6 +580,25 @@ public class Tf_idf_Calculator {
         }
     }
 
+    private void serialize_document_array() {
+        try {
+            FileOutputStream fileOut =
+                    new FileOutputStream(serialized_folder + File.separator + "document_array.ser");
+
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(document_array);
+            out.close();
+            fileOut.close();
+            System.out.printf("Serialized data is saved in " + serialized_folder + File.separator + "document_array.ser");
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static void main(String[] args) {
 
@@ -613,14 +632,10 @@ public class Tf_idf_Calculator {
 
         //serialize t_matrix
         tf.serialize_t_matrix();
-
-        // calculate top p words
-        int p = 600;
-        List<String> p_words_list = tf.get_top_p_words(p);
-        System.out.println("Filtered p top words");
-
-        tf.serialize_p_list(p_words_list);
+        //serialize vocabulary
         tf.serialize_vocabulary();
+        //serialize document_array
+        tf.serialize_document_array();
 
     }
 
