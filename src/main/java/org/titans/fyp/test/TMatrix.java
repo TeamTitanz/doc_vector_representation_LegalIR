@@ -1,4 +1,4 @@
-package org.titans.fyp;
+package org.titans.fyp.test;
 
 import java.io.*;
 
