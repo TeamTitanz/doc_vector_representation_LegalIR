@@ -21,21 +21,24 @@ public class Tf_Idf_Calculator_Part3 {
         File folder = new File(output_folder);
         File[] fileList = folder.listFiles();
         int n = fileList.length;
-        String[] fileNames = new String[n];
+        int[] fileNames = new int[n];
 
         for (int i = 0; i < fileList.length; i++) {
             String full_name = fileList[i].toString();
             int start_index = full_name.lastIndexOf(File.separator);
             int end_index = full_name.lastIndexOf('.');
-            fileNames[i] = full_name.substring(start_index + 1, end_index);
-//            System.out.println(fileNames[i]);
+            fileNames[i] = Integer.parseInt(full_name.substring(start_index + 1, end_index));
         }
         Arrays.sort(fileNames);
+
+        for (int i = 0; i < n; i++) {
+            System.out.println(String.valueOf(fileNames[i]));
+        }
 
         List<List<Double>> DocumentVector = new ArrayList<List<Double>>();
 
         for (int docIndex = 0; docIndex < fileNames.length; docIndex++) {
-            String fileName = output_folder + File.separator + fileNames[docIndex] + ".txt";
+            String fileName = output_folder + File.separator + String.valueOf(fileNames[docIndex]) + ".txt";
             DocumentVector.add(docVector(fileName, docIndex, inputWordList, vocabulary, t_matrix));
         }
 

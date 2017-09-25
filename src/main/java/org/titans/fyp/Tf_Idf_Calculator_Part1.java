@@ -75,24 +75,24 @@ public class Tf_Idf_Calculator_Part1 {
         File folder = new File(cases_folder_path);
 
         File[] fileList = folder.listFiles();
-        String[] fileNames = new String[n];
+        int[] fileNames = new int[n];
         for (int i = 0; i < fileList.length; i++) {
             String full_name = fileList[i].toString();
             int start_index = full_name.lastIndexOf(File.separator);
             int end_index = full_name.lastIndexOf('.');
-            fileNames[i] = full_name.substring(start_index + 1, end_index);
-            System.out.println(fileNames[i]);
+            fileNames[i] = Integer.parseInt(full_name.substring(start_index + 1, end_index));
         }
 
 
         Arrays.sort(fileNames);
 
         for (int i = 0; i < n; i++) {
+            System.out.println(String.valueOf(fileNames[i]));
+        }
 
-
+        for (int i = 0; i < n; i++) {
             // open file
-            String document = tf.file_reader(cases_folder_path + File.separator + fileNames[i] + ".txt");
-
+            String document = tf.file_reader(cases_folder_path + File.separator + String.valueOf(fileNames[i]) + ".txt");
             //convert to lowercase
             //String lowercase_document = tf.convert_to_lowercase(document);
 
