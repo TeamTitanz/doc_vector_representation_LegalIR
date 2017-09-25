@@ -15,30 +15,30 @@ public class DocumentVector {
         System.out.println("Size:" + docVector.size());
 
         int count = 0;
-        double[] vec = new double[600];
+        double[] vec = new double[docVector.get(0).size()];
         for (List<Double> a : docVector) {
             int index = 0;
             for (double b : a) {
-                System.out.print(b + " ");
+//                System.out.print(b + " ");
                 if (b != 0.0) {
 //                    System.out.println(b);
                 }
                 vec[index++] += b;
             }
-            System.out.println();
+//            System.out.println();
         }
 
-//        int oCount = 0;
-//        for (double val : vec) {
-//            System.out.print(val + ", ");
-//            if (val == 0.0) {
-//                oCount++;
-//            }
-//        }
-//
-//        System.out.println("\nMin Value: " + getMinValue(vec));
-//        System.out.println("Max Value: " + getMaxValue(vec));
-//        System.out.println("Zero Count = " + oCount);
+        int oCount = 0;
+        for (double val : vec) {
+            System.out.print(val + ", ");
+            if (val == 0.0) {
+                oCount++;
+            }
+        }
+
+        System.out.println("\nMin Value: " + getMinValue(vec));
+        System.out.println("Max Value: " + getMaxValue(vec));
+        System.out.println("Zero Count = " + oCount);
 
     }
 

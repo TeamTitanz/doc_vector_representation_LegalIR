@@ -16,8 +16,10 @@ public class Tf_Idf_Calculator_Part1 {
     private HashMap<String, Double> gtfList = new HashMap<String, Double>();
     private String[][] document_array;
     StanfordLemmatizer slem = new StanfordLemmatizer();
-    public static String cases_folder_path = "./LawIE/DocVector/Cases";
-    public static String serialized_folder = "./LawIE/DocVector/Serialized_folder";
+    public static String cases_folder_path = "D:\\Project\\fyp\\word2vec\\code\\work8\\up4\\doc_vector_representation_LegalIR\\Output";
+    public static String serialized_folder = "D:\\Project\\fyp\\word2vec\\code\\work8\\up4\\doc_vector_representation_LegalIR\\Serialized_folder";
+    public static double alpha;
+
 
     private Tf_Idf_Calculator_Part1(int n) {
         document_array = new String[n][];
@@ -296,19 +298,22 @@ public class Tf_Idf_Calculator_Part1 {
         double mean = sum1 / count;
         double variance = (count * sum2 - sum1 * sum1) / (count * count);
         double sigma = Math.sqrt(variance);
+        System.out.println("Alpha = " + alpha);
+        double mean_plus_sigma = (mean + (alpha * sigma));
+        double mean_minus_sigma = (mean - (alpha * sigma));
 
         System.out.println("GTF -> (mean)" + mean);
         System.out.println("GTF -> (sigma)" + sigma);
-        System.out.println("GTF -> (mean + sigma)" + (mean + sigma));
-        System.out.println("GTF -> (mean - sigma)" + (mean - sigma));
+        System.out.println("GTF -> (mean + alpha*sigma)" + mean_plus_sigma);
+        System.out.println("GTF -> (mean - alpha*sigma)" + mean_minus_sigma);
 
         for (Map.Entry<String, Double> entry : new_gtfList.entrySet()) {
             double current_value = entry.getValue();
 
-            if (current_value > (mean + sigma)) {
+            if (current_value > mean_plus_sigma) {
                 current_value = 0;
             }
-            if (current_value < (mean - sigma)) {
+            if (current_value < mean_minus_sigma) {
                 current_value = 0;
             }
             gtfList.put(entry.getKey(), current_value);
@@ -350,19 +355,22 @@ public class Tf_Idf_Calculator_Part1 {
         double mean = sum1 / count;
         double variance = (count * sum2 - sum1 * sum1) / (count * count);
         double sigma = Math.sqrt(variance);
+        System.out.println("Alpha = " + alpha);
+        double mean_plus_sigma = (mean + (alpha * sigma));
+        double mean_minus_sigma = (mean - (alpha * sigma));
 
         System.out.println("IDF -> (mean)" + mean);
         System.out.println("IDF -> (sigma)" + sigma);
-        System.out.println("IDF -> (mean + sigma)" + (mean + sigma));
-        System.out.println("IDF -> (mean - sigma)" + (mean - sigma));
+        System.out.println("IDF -> (mean + alpha*sigma)" + mean_plus_sigma);
+        System.out.println("IDF -> (mean - alpha*sigma)" + mean_minus_sigma);
 
         for (Map.Entry<String, Double> entry : new_vocabularyBase.entrySet()) {
             double current_value = entry.getValue();
 
-            if (current_value > (mean + sigma)) {
+            if (current_value > mean_plus_sigma) {
                 current_value = 0;
             }
-            if (current_value < (mean - sigma)) {
+            if (current_value < mean_minus_sigma) {
                 current_value = 0;
             }
             vocabularyBase.put(entry.getKey(), current_value);
@@ -500,6 +508,8 @@ public class Tf_Idf_Calculator_Part1 {
 
 
     public static void main(String[] args) {
+
+        Tf_Idf_Calculator_Part1.alpha = 3;
 
         if (args.length == 2) {
             cases_folder_path = args[0];
