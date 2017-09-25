@@ -11,8 +11,8 @@ import java.util.List;
  */
 public class Tf_Idf_Calculator_Part3 {
 
-    public static String serialized_folder = "./LawIE/DocVector/Serialized_folder";
-    public static String output_folder = "./LawIE/DocVector/Output";
+    public static String serialized_folder = "D:\\Project\\fyp\\word2vec\\code\\work8\\up4\\doc_vector_representation_LegalIR\\Serialized_folder";
+    public static String output_folder = "D:\\Project\\fyp\\word2vec\\code\\work8\\up4\\doc_vector_representation_LegalIR\\Output";
     StanfordLemmatizer slem = new StanfordLemmatizer();
 
 

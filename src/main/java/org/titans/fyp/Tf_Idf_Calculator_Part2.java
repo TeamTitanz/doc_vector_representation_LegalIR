@@ -12,7 +12,7 @@ public class Tf_Idf_Calculator_Part2 {
     private HashMap<String, Double> vocabularyBase = new HashMap<String, Double>(); //First used as a counter then used to keep idf
     private HashMap<String, Double> gtfList = new HashMap<String, Double>();
     private String[][] document_array;
-    public static String serialized_folder = "./LawIE/DocVector/Serialized_folder";
+    public static String serialized_folder = "D:\\Project\\fyp\\word2vec\\code\\work8\\up4\\doc_vector_representation_LegalIR\\Serialized_folder";
 
     private double calculate_gtfid(String term) {
         double gtf = gtfList.get(term);
@@ -229,7 +229,7 @@ public class Tf_Idf_Calculator_Part2 {
 
     public static void main(String[] args) {
 
-        int p = 600;
+        int p = 1000;
 
         if (args.length == 1) {
             serialized_folder = args[0];
